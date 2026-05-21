@@ -7,13 +7,15 @@
     var propsCache = {}; // type → [properties]
 
     var SOURCE_KINDS = [
-        { value: 'token',    label: 'Token dinamico' },
+        { value: 'token',    label: 'Proprietà del post' },
         { value: 'acf',      label: 'Campo ACF' },
         { value: 'static',   label: 'Valore fisso (static)' },
         { value: 'fallback', label: 'Fallback (lista ordinata)' },
         { value: 'collect',  label: 'Collect (lista campi ACF)' },
         { value: 'relation', label: 'Relation (ACF relationship)' }
     ];
+
+    var $activeRow = null;
 
     $(function () {
         $root = $('.schema-graph-edit');
@@ -67,14 +69,21 @@
             $('#schema-graph-map-json').val(JSON.stringify(serializeMap()));
         });
 
-        // Click su campo ACF → inserisce nel primo input ACF della riga focused
-        $('.schema-graph-fields li').on('click', function () {
-            var name = $(this).find('code').text();
-            var $target = $(document.activeElement);
-            if ($target.is('input[type="text"]')) {
-                insertAtCursor($target[0], name);
-                $target.trigger('change');
-            }
+        // Tracking della riga attiva (ultima focus)
+        $rowsBody.on('focusin', 'tr.sg-row', function () {
+            $activeRow = $(this);
+            $rowsBody.find('tr.sg-row').removeClass('sg-row--active');
+            $activeRow.addClass('sg-row--active');
+        });
+
+        // Click su token sidebar → imposta sorgente Token + valore
+        $('.schema-graph-tokens li').on('click', function () {
+            applyToActiveRow('token', $(this).data('token'));
+        });
+
+        // Click su campo ACF sidebar → imposta sorgente Campo ACF + nome
+        $('.schema-graph-acfs li').on('click', function () {
+            applyToActiveRow('acf', $(this).data('acf'));
         });
 
         $('#sg-preview-btn').on('click', runPreview);
@@ -315,13 +324,24 @@
         });
     }
 
-    function insertAtCursor(input, text) {
-        var start = input.selectionStart || 0;
-        var end   = input.selectionEnd   || 0;
-        var val   = input.value;
-        input.value = val.substring(0, start) + text + val.substring(end);
-        input.selectionStart = input.selectionEnd = start + text.length;
-        input.focus();
+    function applyToActiveRow(kind, value) {
+        var $row = $activeRow;
+        if (!$row || !$row.length || !$.contains(document, $row[0])) {
+            // Niente riga attiva: ne creo una nuova
+            addRow('', null);
+            $row = $rowsBody.find('tr.sg-row').last();
+            $activeRow = $row;
+            $rowsBody.find('tr.sg-row').removeClass('sg-row--active');
+            $row.addClass('sg-row--active');
+        }
+        $row.find('.sg-kind').val(kind);
+        $row.find('.sg-value-cell').html(renderValueCell(kind, null));
+        if (kind === 'token') {
+            $row.find('.sg-val-token').val(value);
+        } else if (kind === 'acf') {
+            $row.find('.sg-val-acf-name').val(value);
+        }
+        $row.find('.sg-prop').trigger('focus');
     }
 
     function escapeHtml(s) {

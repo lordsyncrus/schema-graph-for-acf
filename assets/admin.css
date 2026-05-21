@@ -61,6 +61,10 @@
     color: #0a4b78;
     font-weight: 600;
 }
+.schema-graph-tokens code {
+    background: #fef9e7;
+    color: #7a5d00;
+}
 .schema-graph-field-meta {
     display: block;
     color: #646970;
@@ -89,6 +93,8 @@
     user-select: none;
 }
 .sg-row.sg-dragging { opacity: 0.5; }
+.sg-row--active > td { background: #f0f6fc; }
+.sg-row--active .sg-prop { box-shadow: inset 0 -2px 0 #2271b1; }
 
 .sg-row input[type="text"],
 .sg-row select {

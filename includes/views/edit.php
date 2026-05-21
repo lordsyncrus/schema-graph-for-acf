@@ -96,11 +96,26 @@ $tokens   = Schema_Graph_Catalog::tokens();
 
             <aside class="schema-graph-side">
                 <div class="schema-graph-card">
+                    <h3><?php esc_html_e( 'Proprietà del post', 'schema-graph-for-acf' ); ?></h3>
+                    <p class="description" style="margin:0 0 8px;">
+                        <?php esc_html_e( 'Click per assegnare alla riga attiva.', 'schema-graph-for-acf' ); ?>
+                    </p>
+                    <ul class="schema-graph-fields schema-graph-tokens">
+                        <?php foreach ( $tokens as $tk => $tk_label ) : ?>
+                            <li data-token="<?php echo esc_attr( $tk ); ?>">
+                                <code><?php echo esc_html( $tk ); ?></code>
+                                <span class="schema-graph-field-meta"><?php echo esc_html( $tk_label ); ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
+                <div class="schema-graph-card">
                     <h3><?php esc_html_e( 'Campi ACF disponibili', 'schema-graph-for-acf' ); ?></h3>
                     <?php if ( $acf_fields ) : ?>
-                        <ul class="schema-graph-fields">
+                        <ul class="schema-graph-fields schema-graph-acfs">
                             <?php foreach ( $acf_fields as $f ) : ?>
-                                <li>
+                                <li data-acf="<?php echo esc_attr( $f['name'] ); ?>">
                                     <code><?php echo esc_html( $f['name'] ); ?></code>
                                     <span class="schema-graph-field-meta"><?php echo esc_html( $f['type'] ); ?> · <?php echo esc_html( $f['label'] ); ?></span>
                                 </li>
