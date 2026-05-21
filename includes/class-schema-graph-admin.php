@@ -242,7 +242,6 @@ class Schema_Graph_Admin {
         if ( ! current_user_can( self::CAPABILITY ) ) wp_send_json_error( 'forbidden', 403 );
 
         $type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
-        if ( ! $type ) wp_send_json_error( 'bad_request', 400 );
 
         wp_send_json_success( [
             'type'       => $type,

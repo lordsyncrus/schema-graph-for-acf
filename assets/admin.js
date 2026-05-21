@@ -29,13 +29,11 @@
 
         renderExistingMap();
 
-        // Carica suggerimenti proprietà se @type già scelto
-        var initialType = $('#sg-type').val();
-        if (initialType) loadPropertySuggestions(initialType);
+        // Suggerimenti proprietà: in base al @type scelto (o "tutte" se vuoto)
+        loadPropertySuggestions($('#sg-type').val() || '');
 
         $('#sg-type').on('change input', function () {
-            var v = $(this).val();
-            if (v) loadPropertySuggestions(v);
+            loadPropertySuggestions($(this).val() || '');
         });
 
         $('#sg-add-row').on('click', function () {
@@ -270,8 +268,9 @@
     }
 
     function loadPropertySuggestions(type) {
-        if (propsCache[type]) {
-            renderPropDatalist(propsCache[type]);
+        var key = type || '__all';
+        if (propsCache[key]) {
+            renderPropDatalist(propsCache[key]);
             return;
         }
         $.get(SchemaGraph.ajaxUrl, {
@@ -280,8 +279,8 @@
             type:   type
         }).done(function (res) {
             if (!res || !res.success) return;
-            propsCache[type] = res.data.properties || [];
-            renderPropDatalist(propsCache[type]);
+            propsCache[key] = res.data.properties || [];
+            renderPropDatalist(propsCache[key]);
         });
     }
 

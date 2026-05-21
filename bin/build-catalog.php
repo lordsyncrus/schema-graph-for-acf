@@ -115,12 +115,14 @@ function inheritedProps( string $tid, array $types, array $directProps, array &$
 
 // Output
 $out = [
-    'version'    => 2,
-    'source'     => 'https://schema.org/',
-    'generated'  => gmdate( 'Y-m-d\TH:i:s\Z' ),
-    'types'      => [],
+    'version'       => 2,
+    'source'        => 'https://schema.org/',
+    'generated'     => gmdate( 'Y-m-d\TH:i:s\Z' ),
+    'types'         => [],
+    'allProperties' => [],
 ];
 
+$all_props = [];
 foreach ( $types as $tid => $t ) {
     $props = inheritedProps( $tid, $types, $directProps, $cache );
     if ( empty( $props ) ) continue; // skip enumeration values puri
@@ -128,9 +130,13 @@ foreach ( $types as $tid => $t ) {
         'label'      => $t['label'],
         'properties' => $props,
     ];
+    foreach ( $props as $p ) $all_props[ $p ] = true;
 }
 
 ksort( $out['types'] );
+$all_props = array_keys( $all_props );
+sort( $all_props, SORT_STRING | SORT_FLAG_CASE );
+$out['allProperties'] = $all_props;
 
 file_put_contents( OUT_PATH, json_encode( $out, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) );
 
