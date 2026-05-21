@@ -4,6 +4,7 @@
 
     var $root, cpt, acfFields, definition;
     var $rowsBody;
+    var propsCache = {}; // type → [properties]
 
     var SOURCE_KINDS = [
         { value: 'token',    label: 'Token dinamico' },
@@ -25,6 +26,15 @@
         $rowsBody = $('#sg-rows');
 
         renderExistingMap();
+
+        // Carica suggerimenti proprietà se @type già scelto
+        var initialType = $('#sg-type').val();
+        if (initialType) loadPropertySuggestions(initialType);
+
+        $('#sg-type').on('change input', function () {
+            var v = $(this).val();
+            if (v) loadPropertySuggestions(v);
+        });
 
         $('#sg-add-row').on('click', function () {
             addRow();
@@ -99,7 +109,7 @@
         return '' +
             '<tr class="sg-row">' +
                 '<td class="sg-handle">⋮⋮</td>' +
-                '<td><input type="text" class="sg-prop" value="' + escapeHtml(prop) + '" placeholder="nome proprietà (es. name)"></td>' +
+                '<td><input type="text" class="sg-prop" list="sg-prop-suggestions" value="' + escapeHtml(prop) + '" placeholder="nome proprietà (es. name)"></td>' +
                 '<td><select class="sg-kind">' + kindOptions + '</select></td>' +
                 '<td class="sg-value-cell"></td>' +
                 '<td class="sg-col-actions"><button type="button" class="button-link button-link-delete sg-remove">' + escapeHtml(SchemaGraph.i18n.remove) + '</button></td>' +
@@ -248,6 +258,30 @@
     function splitLines(str) {
         if (!str) return [];
         return str.split('\n').map(function (l) { return l.trim(); }).filter(Boolean);
+    }
+
+    function loadPropertySuggestions(type) {
+        if (propsCache[type]) {
+            renderPropDatalist(propsCache[type]);
+            return;
+        }
+        $.get(SchemaGraph.ajaxUrl, {
+            action: 'schema_graph_properties',
+            nonce:  SchemaGraph.propsNonce,
+            type:   type
+        }).done(function (res) {
+            if (!res || !res.success) return;
+            propsCache[type] = res.data.properties || [];
+            renderPropDatalist(propsCache[type]);
+        });
+    }
+
+    function renderPropDatalist(props) {
+        var $dl = $('#sg-prop-suggestions');
+        var html = props.map(function (p) {
+            return '<option value="' + escapeHtml(p) + '"></option>';
+        }).join('');
+        $dl.html(html);
     }
 
     function runPreview() {

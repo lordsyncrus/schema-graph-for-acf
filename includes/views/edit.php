@@ -46,11 +46,10 @@ $tokens   = Schema_Graph_Catalog::tokens();
                                 placeholder="es. MusicGroup, Article, Person…">
                             <datalist id="sg-type-list">
                                 <?php foreach ( $catalog as $name => $meta ) : ?>
-                                    <option value="<?php echo esc_attr( $name ); ?>">
-                                        <?php echo esc_attr( $meta['group'] ?? '' ); ?>
-                                    </option>
+                                    <option value="<?php echo esc_attr( $name ); ?>"></option>
                                 <?php endforeach; ?>
                             </datalist>
+                            <datalist id="sg-prop-suggestions"></datalist>
                             <p class="description"><?php esc_html_e( 'Scrivi un @type del catalogo o uno custom (free text).', 'schema-graph-for-acf' ); ?></p>
                         </td>
                     </tr>

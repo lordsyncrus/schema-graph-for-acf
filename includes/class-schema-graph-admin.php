@@ -16,6 +16,7 @@ class Schema_Graph_Admin {
         add_action( 'admin_post_schema_graph_save', [ $this, 'handle_save' ] );
         add_action( 'admin_post_schema_graph_reset', [ $this, 'handle_reset' ] );
         add_action( 'wp_ajax_schema_graph_preview', [ $this, 'ajax_preview' ] );
+        add_action( 'wp_ajax_schema_graph_properties', [ $this, 'ajax_properties' ] );
     }
 
     public function register_menu() {
@@ -49,14 +50,14 @@ class Schema_Graph_Admin {
         );
 
         wp_localize_script( 'schema-graph-admin', 'SchemaGraph', [
-            'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
+            'ajaxUrl'      => admin_url( 'admin-ajax.php' ),
             'previewNonce' => wp_create_nonce( 'schema_graph_preview' ),
-            'tokens'    => Schema_Graph_Catalog::tokens(),
-            'types'     => Schema_Graph_Catalog::types(),
-            'i18n'      => [
-                'addProperty'  => __( 'Aggiungi proprietà', 'schema-graph-for-acf' ),
-                'remove'       => __( 'Rimuovi', 'schema-graph-for-acf' ),
-                'pickType'     => __( 'Scegli un @type per vedere le proprietà suggerite.', 'schema-graph-for-acf' ),
+            'propsNonce'   => wp_create_nonce( 'schema_graph_properties' ),
+            'tokens'       => Schema_Graph_Catalog::tokens(),
+            'i18n'         => [
+                'addProperty'   => __( 'Aggiungi proprietà', 'schema-graph-for-acf' ),
+                'remove'        => __( 'Rimuovi', 'schema-graph-for-acf' ),
+                'pickType'      => __( 'Scegli un @type per vedere le proprietà suggerite.', 'schema-graph-for-acf' ),
                 'noPreviewPost' => __( 'Nessun post pilota disponibile per questo CPT.', 'schema-graph-for-acf' ),
             ],
         ] );
@@ -233,6 +234,19 @@ class Schema_Graph_Admin {
             'post_id' => $post_id,
             'title'   => get_the_title( $post_id ),
             'node'    => $node,
+        ] );
+    }
+
+    public function ajax_properties() {
+        check_ajax_referer( 'schema_graph_properties', 'nonce' );
+        if ( ! current_user_can( self::CAPABILITY ) ) wp_send_json_error( 'forbidden', 403 );
+
+        $type = isset( $_GET['type'] ) ? sanitize_text_field( wp_unslash( $_GET['type'] ) ) : '';
+        if ( ! $type ) wp_send_json_error( 'bad_request', 400 );
+
+        wp_send_json_success( [
+            'type'       => $type,
+            'properties' => Schema_Graph_Catalog::properties_for( $type ),
         ] );
     }
 }
