@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "types": {
+    "Thing": {
+      "label": "Thing",
+      "group": "Generic",
+      "properties": ["name", "description", "url", "image", "identifier", "sameAs"]
+    },
+    "CreativeWork": {
+      "label": "CreativeWork",
+      "group": "Content",
+      "properties": ["name", "headline", "description", "url", "image", "author", "creator", "datePublished", "dateModified", "inLanguage", "keywords", "publisher", "license", "sameAs"]
+    },
+    "Article": {
+      "label": "Article",
+      "group": "Content",
+      "properties": ["headline", "alternativeHeadline", "description", "url", "image", "author", "datePublished", "dateModified", "publisher", "inLanguage", "keywords", "articleSection", "wordCount", "articleBody", "sameAs"]
+    },
+    "NewsArticle": {
+      "label": "NewsArticle",
+      "group": "Content",
+      "properties": ["headline", "description", "url", "image", "author", "datePublished", "dateModified", "publisher", "inLanguage", "articleSection", "dateline", "printSection", "sameAs"]
+    },
+    "BlogPosting": {
+      "label": "BlogPosting",
+      "group": "Content",
+      "properties": ["headline", "description", "url", "image", "author", "datePublished", "dateModified", "publisher", "inLanguage", "keywords", "articleSection", "articleBody", "sameAs"]
+    },
+    "WebPage": {
+      "label": "WebPage",
+      "group": "Content",
+      "properties": ["name", "description", "url", "image", "datePublished", "dateModified", "inLanguage", "primaryImageOfPage", "breadcrumb", "sameAs"]
+    },
+    "Person": {
+      "label": "Person",
+      "group": "People & Orgs",
+      "properties": ["name", "alternateName", "givenName", "familyName", "description", "url", "image", "jobTitle", "worksFor", "birthDate", "deathDate", "nationality", "email", "telephone", "address", "sameAs"]
+    },
+    "Organization": {
+      "label": "Organization",
+      "group": "People & Orgs",
+      "properties": ["name", "legalName", "alternateName", "description", "url", "logo", "image", "email", "telephone", "address", "foundingDate", "founder", "member", "sameAs"]
+    },
+    "LocalBusiness": {
+      "label": "LocalBusiness",
+      "group": "People & Orgs",
+      "properties": ["name", "description", "url", "image", "logo", "telephone", "email", "address", "geo", "openingHours", "priceRange", "sameAs"]
+    },
+    "MusicGroup": {
+      "label": "MusicGroup",
+      "group": "Music",
+      "properties": ["name", "alternateName", "description", "url", "image", "genre", "foundingDate", "foundingLocation", "member", "recordLabel", "album", "track", "sameAs"]
+    },
+    "MusicAlbum": {
+      "label": "MusicAlbum",
+      "group": "Music",
+      "properties": ["name", "description", "url", "image", "byArtist", "datePublished", "numTracks", "albumProductionType", "albumReleaseType", "genre", "track", "sameAs"]
+    },
+    "MusicRecording": {
+      "label": "MusicRecording",
+      "group": "Music",
+      "properties": ["name", "description", "url", "image", "byArtist", "inAlbum", "duration", "isrcCode", "genre", "datePublished", "sameAs"]
+    },
+    "MusicLabel": {
+      "label": "MusicLabel",
+      "group": "Music",
+      "properties": ["name", "description", "url", "image", "logo", "foundingDate", "sameAs"]
+    },
+    "Event": {
+      "label": "Event",
+      "group": "Events",
+      "properties": ["name", "description", "url", "image", "startDate", "endDate", "location", "performer", "organizer", "eventStatus", "eventAttendanceMode", "offers", "sameAs"]
+    },
+    "MusicEvent": {
+      "label": "MusicEvent",
+      "group": "Events",
+      "properties": ["name", "description", "url", "image", "startDate", "endDate", "location", "performer", "organizer", "offers", "sameAs"]
+    },
+    "Product": {
+      "label": "Product",
+      "group": "Commerce",
+      "properties": ["name", "description", "url", "image", "brand", "sku", "gtin", "mpn", "category", "color", "material", "offers", "aggregateRating", "review", "sameAs"]
+    },
+    "Offer": {
+      "label": "Offer",
+      "group": "Commerce",
+      "properties": ["name", "description", "url", "price", "priceCurrency", "availability", "validFrom", "validThrough", "seller"]
+    },
+    "Place": {
+      "label": "Place",
+      "group": "Places",
+      "properties": ["name", "description", "url", "image", "address", "geo", "telephone", "openingHours", "sameAs"]
+    },
+    "PostalAddress": {
+      "label": "PostalAddress",
+      "group": "Places",
+      "properties": ["streetAddress", "addressLocality", "addressRegion", "postalCode", "addressCountry"]
+    },
+    "ImageObject": {
+      "label": "ImageObject",
+      "group": "Media",
+      "properties": ["name", "description", "url", "contentUrl", "width", "height", "caption", "creator", "license"]
+    },
+    "VideoObject": {
+      "label": "VideoObject",
+      "group": "Media",
+      "properties": ["name", "description", "url", "contentUrl", "thumbnailUrl", "duration", "uploadDate", "creator"]
+    },
+    "Recipe": {
+      "label": "Recipe",
+      "group": "Content",
+      "properties": ["name", "description", "url", "image", "author", "datePublished", "recipeIngredient", "recipeInstructions", "recipeYield", "totalTime", "cookTime", "prepTime", "recipeCategory", "recipeCuisine", "nutrition"]
+    },
+    "FAQPage": {
+      "label": "FAQPage",
+      "group": "Content",
+      "properties": ["name", "description", "url", "mainEntity"]
+    },
+    "Book": {
+      "label": "Book",
+      "group": "Content",
+      "properties": ["name", "description", "url", "image", "author", "isbn", "numberOfPages", "bookFormat", "datePublished", "publisher", "inLanguage", "sameAs"]
+    },
+    "Course": {
+      "label": "Course",
+      "group": "Content",
+      "properties": ["name", "description", "url", "image", "provider", "courseCode", "hasCourseInstance", "educationalLevel", "inLanguage"]
+    },
+    "Service": {
+      "label": "Service",
+      "group": "Commerce",
+      "properties": ["name", "description", "url", "image", "provider", "serviceType", "areaServed", "offers", "sameAs"]
+    }
+  }
+}
