@@ -90,7 +90,7 @@ class Schema_Graph_Render {
             }
 
             if ( isset( $source['acf'] ) ) {
-                $v = $this->acf( $source['acf'], $post->ID );
+                $v = $this->normalize_acf_value( $this->acf( $source['acf'], $post->ID ) );
                 if ( ! empty( $source['split'] ) && is_string( $v ) ) {
                     return array_values( array_filter( array_map( 'trim', explode( ',', $v ) ) ) );
                 }
@@ -99,7 +99,7 @@ class Schema_Graph_Render {
 
             if ( isset( $source['collect'] ) ) {
                 $vals = array_map( function( $f ) use ( $post ) {
-                    return $this->acf( $f, $post->ID );
+                    return $this->normalize_acf_value( $this->acf( $f, $post->ID ) );
                 }, (array) $source['collect'] );
                 $vals = array_values( array_filter( $vals ) );
                 return $vals ?: null;
@@ -109,8 +109,9 @@ class Schema_Graph_Render {
                 $related = $this->acf( $source['relation'], $post->ID );
                 if ( ! $related ) return null;
                 $related = is_array( $related ) ? $related : [ $related ];
-                $items = array_map( function( $rel ) use ( $source ) {
+                $items = array_filter( array_map( function( $rel ) use ( $source ) {
                     $rel_id = is_object( $rel ) ? $rel->ID : (int) $rel;
+                    if ( ! $rel_id ) return null;
                     $item = [
                         '@type' => $source['as_type'],
                         'name'  => get_the_title( $rel_id ),
@@ -120,7 +121,7 @@ class Schema_Graph_Render {
                         $item['@id'] = get_permalink( $rel_id ) . $source['id_suffix'];
                     }
                     return array_filter( $item, [ $this, 'not_empty' ] );
-                }, $related );
+                }, $related ) );
                 if ( ! empty( $source['single'] ) ) {
                     return $items[0] ?? null;
                 }
@@ -175,19 +176,21 @@ class Schema_Graph_Render {
         return $value;
     }
 
+    /** Ritorna il valore RAW del campo ACF (può essere WP_Post per relationship/post_object). */
     private function acf( $field, $post_id ) {
         if ( ! function_exists( 'get_field' ) ) return null;
         $v = get_field( $field, $post_id );
-        if ( $v === '' || $v === false ) return null;
-        return $this->normalize_acf_value( $v );
+        return ( $v === '' || $v === false ) ? null : $v;
     }
 
     /**
-     * Evita di dumpare WP_Post interi nel JSON-LD se un campo relationship/
-     * post_object viene usato col source kind `acf`/`collect` invece che
-     * `relation`. WP_Post → permalink. Per sub-nodi tipati va usato `relation`.
+     * Coerce WP_Post → permalink. Applicato nei source kind `acf` e `collect`
+     * (che si aspettano scalari/array di scalari) per evitare di dumpare oggetti
+     * WP_Post interi. NON applicato a `relation`, che lavora col WP_Post raw
+     * per estrarre `->ID` e produrre sub-nodi tipati.
      */
     private function normalize_acf_value( $v ) {
+        if ( $v === null ) return null;
         if ( $v instanceof WP_Post ) {
             return get_permalink( $v->ID );
         }
