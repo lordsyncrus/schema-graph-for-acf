@@ -101,9 +101,13 @@ class Schema_Graph_Admin {
         $cpt = isset( $_POST['cpt'] ) ? sanitize_key( $_POST['cpt'] ) : '';
         check_admin_referer( 'schema_graph_save_' . $cpt );
 
-        $type      = isset( $_POST['type'] )      ? sanitize_text_field( wp_unslash( $_POST['type'] ) )      : '';
-        $id_suffix = isset( $_POST['id_suffix'] ) ? sanitize_text_field( wp_unslash( $_POST['id_suffix'] ) ) : '';
-        $og_type   = isset( $_POST['og_type'] )   ? sanitize_text_field( wp_unslash( $_POST['og_type'] ) )   : 'profile';
+        $type    = isset( $_POST['type'] )    ? sanitize_text_field( wp_unslash( $_POST['type'] ) )    : '';
+        $og_type = isset( $_POST['og_type'] ) ? sanitize_text_field( wp_unslash( $_POST['og_type'] ) ) : 'profile';
+
+        // @id suffix: auto-derivato da slug CPT. Preserva eventuali valori
+        // custom già in DB (es. impostati prima manualmente o via filtro).
+        $existing  = $this->store->get_for_cpt( $cpt );
+        $id_suffix = ! empty( $existing['id_suffix'] ) ? $existing['id_suffix'] : '#' . $cpt;
 
         $map_raw = isset( $_POST['map'] ) ? wp_unslash( $_POST['map'] ) : '[]';
         $map     = json_decode( $map_raw, true );

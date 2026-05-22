@@ -54,15 +54,6 @@ $tokens   = Schema_Graph_Catalog::tokens();
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="sg-id-suffix"><?php esc_html_e( '@id suffix', 'schema-graph-for-acf' ); ?></label></th>
-                        <td>
-                            <input id="sg-id-suffix" name="id_suffix" class="regular-text"
-                                value="<?php echo esc_attr( $definition['id_suffix'] ?? '' ); ?>"
-                                placeholder="es. #artist">
-                            <p class="description"><?php esc_html_e( "Verrà appeso al permalink per generare l'@id.", 'schema-graph-for-acf' ); ?></p>
-                        </td>
-                    </tr>
-                    <tr>
                         <th><label for="sg-og-type">og:type</label></th>
                         <td>
                             <input id="sg-og-type" name="og_type" class="regular-text"
