@@ -15,6 +15,8 @@ class Schema_Graph_Admin {
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
         add_action( 'admin_post_schema_graph_save', [ $this, 'handle_save' ] );
         add_action( 'admin_post_schema_graph_reset', [ $this, 'handle_reset' ] );
+        add_action( 'admin_post_schema_graph_export', [ $this, 'handle_export' ] );
+        add_action( 'admin_post_schema_graph_import', [ $this, 'handle_import' ] );
         add_action( 'wp_ajax_schema_graph_preview', [ $this, 'ajax_preview' ] );
         add_action( 'wp_ajax_schema_graph_properties', [ $this, 'ajax_properties' ] );
     }
@@ -242,5 +244,80 @@ class Schema_Graph_Admin {
             'type'       => $type,
             'properties' => Schema_Graph_Catalog::properties_for( $type ),
         ] );
+    }
+
+    public function handle_export() {
+        if ( ! current_user_can( self::CAPABILITY ) ) {
+            wp_die( esc_html__( 'Permesso negato.', 'schema-graph-for-acf' ) );
+        }
+        check_admin_referer( 'schema_graph_export' );
+
+        $payload = [
+            'schema_graph_version' => SCHEMA_GRAPH_VERSION,
+            'exported_at'          => gmdate( 'c' ),
+            'site_url'             => home_url(),
+            'config'               => $this->store->get_all(),
+        ];
+
+        $filename = 'schema-graph-config-' . gmdate( 'Y-m-d' ) . '.json';
+        nocache_headers();
+        header( 'Content-Type: application/json; charset=utf-8' );
+        header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
+        echo wp_json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+        exit;
+    }
+
+    public function handle_import() {
+        if ( ! current_user_can( self::CAPABILITY ) ) {
+            wp_die( esc_html__( 'Permesso negato.', 'schema-graph-for-acf' ) );
+        }
+        check_admin_referer( 'schema_graph_import' );
+
+        $redirect = add_query_arg( [ 'page' => self::MENU_SLUG ], admin_url( 'admin.php' ) );
+
+        if ( empty( $_FILES['file']['tmp_name'] ) || ! is_uploaded_file( $_FILES['file']['tmp_name'] ) ) {
+            wp_safe_redirect( add_query_arg( 'import_error', 'no_file', $redirect ) );
+            exit;
+        }
+
+        $raw = file_get_contents( $_FILES['file']['tmp_name'] );
+        $data = json_decode( $raw, true );
+        if ( ! is_array( $data ) || ! isset( $data['config'] ) || ! is_array( $data['config'] ) ) {
+            wp_safe_redirect( add_query_arg( 'import_error', 'invalid_json', $redirect ) );
+            exit;
+        }
+
+        $mode = isset( $_POST['mode'] ) && $_POST['mode'] === 'replace' ? 'replace' : 'merge';
+        $sanitized = $this->sanitize_imported_config( $data['config'] );
+
+        if ( $mode === 'replace' ) {
+            $this->store->replace_all( $sanitized );
+        } else {
+            foreach ( $sanitized as $cpt => $def ) {
+                $this->store->save_for_cpt( $cpt, $def );
+            }
+        }
+
+        $imported_count = count( $sanitized );
+        wp_safe_redirect( add_query_arg( [
+            'imported' => $imported_count,
+            'mode'     => $mode,
+        ], $redirect ) );
+        exit;
+    }
+
+    private function sanitize_imported_config( array $config ) {
+        $out = [];
+        foreach ( $config as $cpt => $def ) {
+            $cpt = sanitize_key( $cpt );
+            if ( ! $cpt || ! is_array( $def ) ) continue;
+            $out[ $cpt ] = [
+                'type'      => isset( $def['type'] )      ? sanitize_text_field( $def['type'] )      : '',
+                'id_suffix' => isset( $def['id_suffix'] ) ? sanitize_text_field( $def['id_suffix'] ) : '#' . $cpt,
+                'og_type'   => isset( $def['og_type'] )   ? sanitize_text_field( $def['og_type'] )   : 'website',
+                'map'       => isset( $def['map'] ) && is_array( $def['map'] ) ? $this->sanitize_map( $def['map'] ) : [],
+            ];
+        }
+        return $out;
     }
 }

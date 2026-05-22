@@ -18,6 +18,27 @@
 .schema-graph-badge--on  { background: #d1e7dd; color: #0f5132; }
 .schema-graph-badge--off { background: #f0f0f1; color: #646970; }
 
+.schema-graph-iox {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 24px;
+    max-width: 900px;
+}
+.schema-graph-iox-card {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    padding: 16px 20px;
+}
+.schema-graph-iox-card h2 {
+    margin-top: 0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #50575e;
+}
+
 .schema-graph-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 340px;
