@@ -121,7 +121,7 @@ $tokens   = Schema_Graph_Catalog::tokens();
                     <?php if ( $acf_fields ) : ?>
                         <ul class="schema-graph-fields schema-graph-acfs">
                             <?php foreach ( $acf_fields as $f ) : ?>
-                                <li data-acf="<?php echo esc_attr( $f['name'] ); ?>">
+                                <li data-acf="<?php echo esc_attr( $f['name'] ); ?>" data-acf-type="<?php echo esc_attr( $f['type'] ); ?>">
                                     <code><?php echo esc_html( $f['name'] ); ?></code>
                                     <span class="schema-graph-field-meta"><?php echo esc_html( $f['type'] ); ?> · <?php echo esc_html( $f['label'] ); ?></span>
                                 </li>

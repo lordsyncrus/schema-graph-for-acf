@@ -106,9 +106,18 @@
             applyToActiveRow('token', $(this).data('token'));
         });
 
-        // Click su campo ACF sidebar → imposta sorgente Campo ACF + nome
+        // Click su campo ACF sidebar → imposta sorgente corretta in base al tipo.
+        // I campi relationship/post_object ritornano WP_Post objects, quindi
+        // vanno usati col source kind "Relation" (genera sub-nodi tipati),
+        // non col "Campo ACF" che li dumperebbe come oggetti raw.
         $('.schema-graph-acfs li').on('click', function () {
-            applyToActiveRow('acf', $(this).data('acf'));
+            var name = $(this).data('acf');
+            var type = $(this).data('acf-type');
+            if (type === 'relationship' || type === 'post_object') {
+                applyToActiveRow('relation', { relation: name });
+            } else {
+                applyToActiveRow('acf', name);
+            }
         });
 
         $('#sg-preview-btn').on('click', runPreview);
@@ -366,6 +375,8 @@
             $row.find('.sg-val-token').val(value);
         } else if (kind === 'acf') {
             $row.find('.sg-val-acf-name').val(value);
+        } else if (kind === 'relation' && value && typeof value === 'object') {
+            $row.find('.sg-val-rel').val(value.relation || '');
         }
         $row.find('.sg-prop').trigger('focus');
     }
