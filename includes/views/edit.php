@@ -56,8 +56,23 @@ $tokens   = Schema_Graph_Catalog::tokens();
                     <tr>
                         <th><label for="sg-og-type">og:type</label></th>
                         <td>
-                            <input id="sg-og-type" name="og_type" class="regular-text"
-                                value="<?php echo esc_attr( $definition['og_type'] ?? 'profile' ); ?>">
+                            <?php
+                            $og_current = $definition['og_type'] ?? '';
+                            $og_options = Schema_Graph_Catalog::og_types();
+                            ?>
+                            <select id="sg-og-type" name="og_type" class="regular-text">
+                                <?php foreach ( $og_options as $val => $label ) : ?>
+                                    <option value="<?php echo esc_attr( $val ); ?>"<?php selected( $og_current, $val ); ?>>
+                                        <?php echo esc_html( $val . ' — ' . $label ); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <?php if ( $og_current && ! isset( $og_options[ $og_current ] ) ) : ?>
+                                    <option value="<?php echo esc_attr( $og_current ); ?>" selected>
+                                        <?php echo esc_html( $og_current . ' (custom)' ); ?>
+                                    </option>
+                                <?php endif; ?>
+                            </select>
+                            <p class="description"><?php esc_html_e( 'Open Graph type per le anteprime social. Pre-compilato in base al @type schema; puoi modificarlo.', 'schema-graph-for-acf' ); ?></p>
                         </td>
                     </tr>
                 </table>

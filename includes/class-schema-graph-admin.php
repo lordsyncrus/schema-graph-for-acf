@@ -54,6 +54,7 @@ class Schema_Graph_Admin {
             'previewNonce' => wp_create_nonce( 'schema_graph_preview' ),
             'propsNonce'   => wp_create_nonce( 'schema_graph_properties' ),
             'tokens'       => Schema_Graph_Catalog::tokens(),
+            'ogTypeMap'    => Schema_Graph_Catalog::og_type_map(),
             'i18n'         => [
                 'addProperty'   => __( 'Aggiungi proprietà', 'schema-graph-for-acf' ),
                 'remove'        => __( 'Rimuovi', 'schema-graph-for-acf' ),

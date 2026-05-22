@@ -69,6 +69,54 @@ class Schema_Graph_Catalog {
         return self::load()['allProperties'] ?? [];
     }
 
+    /** Mappa @type schema.org → og:type Open Graph. Fallback: website. */
+    public static function og_type_for( $schema_type ) {
+        $map = self::og_type_map();
+        return $map[ $schema_type ] ?? 'website';
+    }
+
+    public static function og_type_map() {
+        return [
+            'MusicGroup'        => 'profile',
+            'MusicAlbum'        => 'music.album',
+            'MusicRecording'    => 'music.song',
+            'AudioObject'       => 'music.song',
+            'MusicPlaylist'     => 'music.playlist',
+            'BroadcastService'  => 'music.radio_station',
+            'RadioStation'      => 'music.radio_station',
+            'Article'           => 'article',
+            'NewsArticle'       => 'article',
+            'BlogPosting'       => 'article',
+            'Report'            => 'article',
+            'Book'              => 'book',
+            'Person'            => 'profile',
+            'Organization'      => 'profile',
+            'LocalBusiness'     => 'profile',
+            'MusicLabel'        => 'profile',
+            'VideoObject'       => 'video.other',
+            'Movie'             => 'video.movie',
+            'TVEpisode'         => 'video.episode',
+            'TVSeries'          => 'video.tv_show',
+        ];
+    }
+
+    public static function og_types() {
+        return [
+            'website'              => __( 'Generico (website)', 'schema-graph-for-acf' ),
+            'article'              => __( 'Articolo / blog post', 'schema-graph-for-acf' ),
+            'profile'              => __( 'Profilo (persona, gruppo, brand)', 'schema-graph-for-acf' ),
+            'book'                 => __( 'Libro', 'schema-graph-for-acf' ),
+            'music.song'           => __( 'Brano musicale', 'schema-graph-for-acf' ),
+            'music.album'          => __( 'Album musicale', 'schema-graph-for-acf' ),
+            'music.playlist'       => __( 'Playlist', 'schema-graph-for-acf' ),
+            'music.radio_station'  => __( 'Stazione radio', 'schema-graph-for-acf' ),
+            'video.movie'          => __( 'Film', 'schema-graph-for-acf' ),
+            'video.episode'        => __( 'Episodio TV', 'schema-graph-for-acf' ),
+            'video.tv_show'        => __( 'Serie TV', 'schema-graph-for-acf' ),
+            'video.other'          => __( 'Altro video', 'schema-graph-for-acf' ),
+        ];
+    }
+
     public static function tokens() {
         return [
             ':title'     => __( 'Titolo del post', 'schema-graph-for-acf' ),

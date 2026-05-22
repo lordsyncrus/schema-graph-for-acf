@@ -32,9 +32,36 @@
         // Suggerimenti proprietà: in base al @type scelto (o "tutte" se vuoto)
         loadPropertySuggestions($('#sg-type').val() || '');
 
-        $('#sg-type').on('change input', function () {
-            loadPropertySuggestions($(this).val() || '');
+        // Track se l'utente ha modificato manualmente og:type.
+        // Se è uguale al default per il @type attuale, è "non dirty" → si aggiorna.
+        var $ogType = $('#sg-og-type');
+        var ogDirty = (function () {
+            var currentType = $('#sg-type').val();
+            var currentOg   = $ogType.val();
+            var expected    = (SchemaGraph.ogTypeMap && SchemaGraph.ogTypeMap[currentType]) || 'website';
+            // Se vuoto (nuovo mapping) o uguale al default → non dirty
+            return currentOg && currentOg !== expected;
+        })();
+
+        $ogType.on('change', function () {
+            ogDirty = true;
         });
+
+        $('#sg-type').on('change input', function () {
+            var type = $(this).val() || '';
+            loadPropertySuggestions(type);
+            if (!ogDirty) {
+                var suggested = (SchemaGraph.ogTypeMap && SchemaGraph.ogTypeMap[type]) || 'website';
+                $ogType.val(suggested);
+            }
+        });
+
+        // Inizializza og:type se vuoto (caso nuovo mapping)
+        if (!$ogType.val() && !ogDirty) {
+            var initType = $('#sg-type').val();
+            var initOg   = (SchemaGraph.ogTypeMap && SchemaGraph.ogTypeMap[initType]) || 'website';
+            $ogType.val(initOg);
+        }
 
         $('#sg-add-row').on('click', function () {
             addRow();
