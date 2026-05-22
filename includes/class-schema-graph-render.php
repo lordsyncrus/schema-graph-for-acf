@@ -143,7 +143,33 @@ class Schema_Graph_Render {
     private function acf( $field, $post_id ) {
         if ( ! function_exists( 'get_field' ) ) return null;
         $v = get_field( $field, $post_id );
-        return ( $v === '' || $v === false ) ? null : $v;
+        if ( $v === '' || $v === false ) return null;
+        return $this->normalize_acf_value( $v );
+    }
+
+    /**
+     * Normalizza un valore ACF prima di inserirlo nel JSON-LD.
+     *
+     * Evita di dumpare oggetti WP_Post interi (con post_content, ecc.) nel
+     * caso in cui un campo relationship/post_object venga usato dentro un
+     * source kind generico (`acf` / `collect`) invece che `relation`.
+     * Per i WP_Post restituisce l'URL del permalink: una stringa è quasi
+     * sempre il valore atteso in quel contesto. Per relazioni strutturate
+     * va usato il source kind `relation`, che produce sub-nodi tipati.
+     */
+    private function normalize_acf_value( $v ) {
+        if ( $v instanceof WP_Post ) {
+            return get_permalink( $v->ID );
+        }
+        if ( is_array( $v ) ) {
+            $out = [];
+            foreach ( $v as $item ) {
+                $n = $this->normalize_acf_value( $item );
+                if ( $n !== null && $n !== '' && $n !== [] ) $out[] = $n;
+            }
+            return $out ? $out : null;
+        }
+        return $v;
     }
 
     private function not_empty( $v ) {
