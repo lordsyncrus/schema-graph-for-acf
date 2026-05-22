@@ -17,6 +17,9 @@ class Schema_Graph_Render {
         add_action( 'wp_head', [ $this, 'output' ], 5 );
         add_filter( 'wpseo_schema_graph', [ $this, 'disable_yoast' ], 10, 2 );
         add_filter( 'wpseo_opengraph_type', [ $this, 'og_type' ] );
+        // ACF Pro 6.x emette il proprio JSON-LD via acf/schema/data.
+        // Disabilitiamo l'output ACF sui CPT che gestiamo noi per evitare doppioni.
+        add_filter( 'acf/schema/disable_output', [ $this, 'disable_acf_schema' ], 10, 2 );
     }
 
     /**
@@ -194,6 +197,10 @@ class Schema_Graph_Render {
 
     public function disable_yoast( $graph, $context ) {
         return $this->def_for_current() ? [] : $graph;
+    }
+
+    public function disable_acf_schema( $disabled, $context = null ) {
+        return $this->def_for_current() ? true : $disabled;
     }
 
     public function og_type( $type ) {
