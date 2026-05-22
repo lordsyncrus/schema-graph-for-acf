@@ -124,6 +124,7 @@ class Schema_Graph_Catalog {
             ':date_modified'  => __( 'Data di modifica (ISO 8601)', 'schema-graph-for-acf' ),
             ':home'           => __( 'Home URL', 'schema-graph-for-acf' ),
             ':site_name'      => __( 'Nome del sito', 'schema-graph-for-acf' ),
+            ':site_icon'      => __( 'Icona del sito (Site Icon WP)', 'schema-graph-for-acf' ),
         ];
     }
 }

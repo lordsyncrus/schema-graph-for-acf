@@ -141,6 +141,7 @@ class Schema_Graph_Render {
             case ':content':        return $post->post_content ? wp_strip_all_tags( $post->post_content ) : null;
             case ':home':           return home_url();
             case ':site_name':      return get_bloginfo( 'name' );
+            case ':site_icon':      return function_exists( 'get_site_icon_url' ) ? ( get_site_icon_url() ?: null ) : null;
             case ':date_published': return self::iso8601( $post, 'date' );
             case ':date_modified':  return self::iso8601( $post, 'modified' );
         }
