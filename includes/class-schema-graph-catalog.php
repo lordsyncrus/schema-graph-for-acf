@@ -119,13 +119,15 @@ class Schema_Graph_Catalog {
 
     public static function tokens() {
         return [
-            ':title'     => __( 'Titolo del post', 'schema-graph-for-acf' ),
-            ':permalink' => __( 'Permalink', 'schema-graph-for-acf' ),
-            ':thumbnail' => __( 'Immagine in evidenza', 'schema-graph-for-acf' ),
-            ':excerpt'   => __( 'Excerpt (testo pulito)', 'schema-graph-for-acf' ),
-            ':content'   => __( 'Contenuto (testo pulito)', 'schema-graph-for-acf' ),
-            ':home'      => __( 'Home URL', 'schema-graph-for-acf' ),
-            ':site_name' => __( 'Nome del sito', 'schema-graph-for-acf' ),
+            ':title'          => __( 'Titolo del post', 'schema-graph-for-acf' ),
+            ':permalink'      => __( 'Permalink', 'schema-graph-for-acf' ),
+            ':thumbnail'      => __( 'Immagine in evidenza', 'schema-graph-for-acf' ),
+            ':excerpt'        => __( 'Excerpt (testo pulito)', 'schema-graph-for-acf' ),
+            ':content'        => __( 'Contenuto (testo pulito)', 'schema-graph-for-acf' ),
+            ':date_published' => __( 'Data di pubblicazione (ISO 8601)', 'schema-graph-for-acf' ),
+            ':date_modified'  => __( 'Data di modifica (ISO 8601)', 'schema-graph-for-acf' ),
+            ':home'           => __( 'Home URL', 'schema-graph-for-acf' ),
+            ':site_name'      => __( 'Nome del sito', 'schema-graph-for-acf' ),
         ];
     }
 }

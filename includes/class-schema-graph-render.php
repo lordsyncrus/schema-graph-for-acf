@@ -117,13 +117,15 @@ class Schema_Graph_Render {
 
     private function resolve_scalar( $token, $post ) {
         switch ( $token ) {
-            case ':title':     return get_the_title( $post );
-            case ':permalink': return get_permalink( $post );
-            case ':thumbnail': return get_the_post_thumbnail_url( $post, 'full' ) ?: null;
-            case ':excerpt':   return $post->post_excerpt ? wp_strip_all_tags( $post->post_excerpt ) : null;
-            case ':content':   return $post->post_content ? wp_strip_all_tags( $post->post_content ) : null;
-            case ':home':      return home_url();
-            case ':site_name': return get_bloginfo( 'name' );
+            case ':title':          return get_the_title( $post );
+            case ':permalink':      return get_permalink( $post );
+            case ':thumbnail':      return get_the_post_thumbnail_url( $post, 'full' ) ?: null;
+            case ':excerpt':        return $post->post_excerpt ? wp_strip_all_tags( $post->post_excerpt ) : null;
+            case ':content':        return $post->post_content ? wp_strip_all_tags( $post->post_content ) : null;
+            case ':home':           return home_url();
+            case ':site_name':      return get_bloginfo( 'name' );
+            case ':date_published': return $post->post_date     ? mysql2date( 'c', $post->post_date,     false ) : null;
+            case ':date_modified':  return $post->post_modified ? mysql2date( 'c', $post->post_modified, false ) : null;
         }
         return $this->acf( $token, $post->ID );
     }
