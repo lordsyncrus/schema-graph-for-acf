@@ -153,8 +153,19 @@ class Schema_Graph_Render {
     }
 
     private function resolve_deep( $value, $post ) {
-        if ( is_string( $value ) && isset( $value[0] ) && $value[0] === ':' ) {
-            return $this->resolve_scalar( $value, $post );
+        if ( is_string( $value ) ) {
+            // Stringa che inizia con ':' → token completo (es. ":site_name").
+            if ( isset( $value[0] ) && $value[0] === ':' && strpos( $value, '{{' ) === false ) {
+                return $this->resolve_scalar( $value, $post );
+            }
+            // Interpolazione "{{:token}}" dentro stringhe miste.
+            if ( strpos( $value, '{{' ) !== false ) {
+                return preg_replace_callback( '/\{\{(:[a-z_]+)\}\}/', function( $m ) use ( $post ) {
+                    $v = $this->resolve_scalar( $m[1], $post );
+                    return is_scalar( $v ) ? (string) $v : '';
+                }, $value );
+            }
+            return $value;
         }
         if ( is_array( $value ) ) {
             return array_map( function( $v ) use ( $post ) {

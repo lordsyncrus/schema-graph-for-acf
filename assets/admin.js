@@ -211,7 +211,7 @@
             var s = source.static;
             val = (typeof s === 'string') ? s : JSON.stringify(s, null, 2);
         }
-        return '<textarea class="sg-val-static" rows="3" placeholder="valore fisso — stringa o JSON. I token :tipo verranno risolti.">' + escapeHtml(val) + '</textarea>';
+        return '<textarea class="sg-val-static" rows="3" placeholder="valore fisso — stringa o JSON. Token completi: :site_name, :home, ecc. Interpolazione in stringhe: {{:site_name}}.">' + escapeHtml(val) + '</textarea>';
     }
 
     function renderListInput(items, _hint, placeholder) {
