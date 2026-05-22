@@ -3,7 +3,7 @@
  * Plugin Name: Schema Graph for ACF
  * Plugin URI:  https://github.com/lordsyncrus/schema-graph-for-acf
  * Description: Motore generico ACF → JSON-LD schema.org. Mappa qualsiasi CPT/campo ACF tramite una UI di admin no-code. Compatibile con ACF Free e ACF Pro.
- * Version:     3.1.7
+ * Version:     3.2.0
  * Author:      3Heads Agency
  * License:     GPL-2.0-or-later
  * Text Domain: schema-graph-for-acf
@@ -12,7 +12,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SCHEMA_GRAPH_VERSION', '3.1.7' );
+define( 'SCHEMA_GRAPH_VERSION', '3.2.0' );
 define( 'SCHEMA_GRAPH_FILE', __FILE__ );
 define( 'SCHEMA_GRAPH_PATH', plugin_dir_path( __FILE__ ) );
 define( 'SCHEMA_GRAPH_URL', plugin_dir_url( __FILE__ ) );

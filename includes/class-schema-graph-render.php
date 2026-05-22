@@ -6,6 +6,11 @@ class Schema_Graph_Render {
     /** @var Schema_Graph_Config_Store */
     private $store;
 
+    /** @var array|null Cache per-request della definizione del post corrente. */
+    private $current_def;
+    /** @var bool Flag "definizione corrente già risolta" (distingue null da non-risolta). */
+    private $current_def_done = false;
+
     public function __construct( Schema_Graph_Config_Store $store ) {
         $this->store = $store;
 
@@ -14,18 +19,26 @@ class Schema_Graph_Render {
         add_filter( 'wpseo_opengraph_type', [ $this, 'og_type' ] );
     }
 
+    /**
+     * Risolve la definizione del CPT corrente una sola volta per request.
+     * Hooks coinvolti su una pagina singular: wp_head, wpseo_schema_graph,
+     * wpseo_opengraph_type → senza cache faremmo 3 get_option + 3 get_post_type.
+     */
     private function def_for_current() {
-        $pt = get_post_type();
-        return $pt ? $this->store->get_for_cpt( $pt ) : null;
+        if ( $this->current_def_done ) return $this->current_def;
+        $this->current_def_done = true;
+        $post = is_singular() ? get_queried_object() : null;
+        $this->current_def = ( $post instanceof WP_Post )
+            ? $this->store->get_for_cpt( $post->post_type )
+            : null;
+        return $this->current_def;
     }
 
     public function output() {
-        if ( ! is_singular() ) return;
-        $post = get_queried_object();
-        $def  = $this->store->get_for_cpt( $post->post_type );
+        $def = $this->def_for_current();
         if ( ! $def ) return;
 
-        $node = $this->build_node( $post, $def );
+        $node = $this->build_node( get_queried_object(), $def );
         if ( $node ) {
             echo "\n<script type=\"application/ld+json\">"
                . wp_json_encode( $node, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE )
@@ -50,7 +63,7 @@ class Schema_Graph_Render {
             }
         }
 
-        return array_filter( $node, [ $this, 'not_empty' ] );
+        return $node;
     }
 
     private function resolve( $source, $post ) {
@@ -124,10 +137,16 @@ class Schema_Graph_Render {
             case ':content':        return $post->post_content ? wp_strip_all_tags( $post->post_content ) : null;
             case ':home':           return home_url();
             case ':site_name':      return get_bloginfo( 'name' );
-            case ':date_published': return $post->post_date     ? mysql2date( 'c', $post->post_date,     false ) : null;
-            case ':date_modified':  return $post->post_modified ? mysql2date( 'c', $post->post_modified, false ) : null;
+            case ':date_published': return self::iso8601( $post, 'date' );
+            case ':date_modified':  return self::iso8601( $post, 'modified' );
         }
         return $this->acf( $token, $post->ID );
+    }
+
+    /** Restituisce data del post in ISO 8601 col fuso WP. Usa il datetime WP-aware. */
+    private static function iso8601( $post, $which ) {
+        $dt = get_post_datetime( $post, $which );
+        return $dt ? $dt->format( 'c' ) : null;
     }
 
     private function resolve_deep( $value, $post ) {
@@ -150,14 +169,9 @@ class Schema_Graph_Render {
     }
 
     /**
-     * Normalizza un valore ACF prima di inserirlo nel JSON-LD.
-     *
-     * Evita di dumpare oggetti WP_Post interi (con post_content, ecc.) nel
-     * caso in cui un campo relationship/post_object venga usato dentro un
-     * source kind generico (`acf` / `collect`) invece che `relation`.
-     * Per i WP_Post restituisce l'URL del permalink: una stringa è quasi
-     * sempre il valore atteso in quel contesto. Per relazioni strutturate
-     * va usato il source kind `relation`, che produce sub-nodi tipati.
+     * Evita di dumpare WP_Post interi nel JSON-LD se un campo relationship/
+     * post_object viene usato col source kind `acf`/`collect` invece che
+     * `relation`. WP_Post → permalink. Per sub-nodi tipati va usato `relation`.
      */
     private function normalize_acf_value( $v ) {
         if ( $v instanceof WP_Post ) {
@@ -184,6 +198,8 @@ class Schema_Graph_Render {
 
     public function og_type( $type ) {
         $def = $this->def_for_current();
-        return $def ? ( $def['og_type'] ?? 'profile' ) : $type;
+        if ( ! $def ) return $type;
+        if ( ! empty( $def['og_type'] ) ) return $def['og_type'];
+        return Schema_Graph_Catalog::og_type_for( $def['type'] ?? '' );
     }
 }

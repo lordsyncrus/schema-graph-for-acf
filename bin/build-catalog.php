@@ -28,25 +28,19 @@ function short( string $id ): string {
     return preg_replace( '#^https?://schema\.org/#', '', $id );
 }
 
-/** Parse CSV → array di righe come array assoc. */
+/** Parse CSV → array di righe come array assoc. Usa fgetcsv (gestisce quoted newlines). */
 function csv_to_rows( string $csv ): array {
+    $fh = fopen( 'php://temp', 'r+' );
+    fwrite( $fh, $csv );
+    rewind( $fh );
+    $header = fgetcsv( $fh, 0, ',', '"', '\\' );
+    if ( ! $header ) { fclose( $fh ); return []; }
     $rows = [];
-    $lines = preg_split( '/\R/', $csv );
-    $header = null;
-    $buf = '';
-    foreach ( $lines as $line ) {
-        $buf = $buf === '' ? $line : $buf . "\n" . $line;
-        if ( substr_count( $buf, '"' ) % 2 !== 0 ) continue;
-        $row = str_getcsv( $buf, ',', '"', '\\' );
-        $buf = '';
-        if ( $header === null ) { $header = $row; continue; }
-        if ( count( $row ) === 1 && $row[0] === '' ) continue;
-        $assoc = [];
-        foreach ( $header as $i => $h ) {
-            $assoc[ $h ] = $row[ $i ] ?? '';
-        }
-        $rows[] = $assoc;
+    while ( ( $row = fgetcsv( $fh, 0, ',', '"', '\\' ) ) !== false ) {
+        if ( count( $row ) === 1 && ( $row[0] === null || $row[0] === '' ) ) continue;
+        $rows[] = array_combine( $header, array_pad( $row, count( $header ), '' ) );
     }
+    fclose( $fh );
     return $rows;
 }
 

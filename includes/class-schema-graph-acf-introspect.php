@@ -32,14 +32,6 @@ class Schema_Graph_ACF_Introspect {
         return $out;
     }
 
-    /** Solo i campi di tipo relationship/post_object per il source kind "Relation". */
-    public static function relation_fields_for_cpt( $cpt ) {
-        $all = self::fields_for_cpt( $cpt );
-        return array_values( array_filter( $all, function( $f ) {
-            return in_array( $f['type'], [ 'relationship', 'post_object' ], true );
-        } ) );
-    }
-
     /** Lista dei CPT pubblici registrati. */
     public static function public_post_types() {
         $types = get_post_types( [ 'public' => true ], 'objects' );

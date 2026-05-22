@@ -1,7 +1,7 @@
 {
     "version": 2,
     "source": "https://schema.org/",
-    "generated": "2026-05-21T18:57:10Z",
+    "generated": "2026-05-22T18:10:21Z",
     "types": {
         "3DModel": {
             "label": "3DModel",

@@ -15,8 +15,6 @@
         { value: 'relation', label: 'Relation (ACF relationship)' }
     ];
 
-    var $activeRow = null;
-
     $(function () {
         $root = $('.schema-graph-edit');
         if (!$root.length) return;
@@ -94,11 +92,10 @@
             $('#schema-graph-map-json').val(JSON.stringify(serializeMap()));
         });
 
-        // Tracking della riga attiva (ultima focus)
+        // La riga attiva è quella con .sg-row--active. Source of truth = DOM.
         $rowsBody.on('focusin', 'tr.sg-row', function () {
-            $activeRow = $(this);
             $rowsBody.find('tr.sg-row').removeClass('sg-row--active');
-            $activeRow.addClass('sg-row--active');
+            $(this).addClass('sg-row--active');
         });
 
         // Click su token sidebar → imposta sorgente Token + valore
@@ -217,10 +214,9 @@
         return '<textarea class="sg-val-static" rows="3" placeholder="valore fisso — stringa o JSON. I token :tipo verranno risolti.">' + escapeHtml(val) + '</textarea>';
     }
 
-    function renderListInput(items, hint, placeholder) {
+    function renderListInput(items, _hint, placeholder) {
         var lines = Array.isArray(items) ? items.join('\n') : '';
-        return '<textarea class="sg-val-list" rows="3" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(lines) + '</textarea>' +
-               '<p class="description" style="margin:4px 0 0;">' + escapeHtml(placeholder) + '</p>';
+        return '<textarea class="sg-val-list" rows="3" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(lines) + '</textarea>';
     }
 
     function renderRelationInput(source) {
@@ -335,10 +331,9 @@
         $out.hide();
 
         var def = {
-            type:      $('#sg-type').val(),
-            id_suffix: $('#sg-id-suffix').val(),
-            og_type:   $('#sg-og-type').val(),
-            map:       serializeMap()
+            type:    $('#sg-type').val(),
+            og_type: $('#sg-og-type').val(),
+            map:     serializeMap()
         };
 
         $.post(SchemaGraph.ajaxUrl, {
@@ -360,12 +355,10 @@
     }
 
     function applyToActiveRow(kind, value) {
-        var $row = $activeRow;
-        if (!$row || !$row.length || !$.contains(document, $row[0])) {
-            // Niente riga attiva: ne creo una nuova
+        var $row = $rowsBody.find('tr.sg-row--active');
+        if (!$row.length) {
             addRow('', null);
             $row = $rowsBody.find('tr.sg-row').last();
-            $activeRow = $row;
             $rowsBody.find('tr.sg-row').removeClass('sg-row--active');
             $row.addClass('sg-row--active');
         }

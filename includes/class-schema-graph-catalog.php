@@ -36,10 +36,6 @@ class Schema_Graph_Catalog {
         return $curated + $expanded;
     }
 
-    public static function type_names() {
-        return array_keys( self::types() );
-    }
-
     /**
      * Proprietà suggerite per un @type.
      * - Type vuoto → tutte le proprietà schema.org (universo)

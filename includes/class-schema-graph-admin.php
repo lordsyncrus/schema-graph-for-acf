@@ -56,10 +56,7 @@ class Schema_Graph_Admin {
             'tokens'       => Schema_Graph_Catalog::tokens(),
             'ogTypeMap'    => Schema_Graph_Catalog::og_type_map(),
             'i18n'         => [
-                'addProperty'   => __( 'Aggiungi proprietà', 'schema-graph-for-acf' ),
-                'remove'        => __( 'Rimuovi', 'schema-graph-for-acf' ),
-                'pickType'      => __( 'Scegli un @type per vedere le proprietà suggerite.', 'schema-graph-for-acf' ),
-                'noPreviewPost' => __( 'Nessun post pilota disponibile per questo CPT.', 'schema-graph-for-acf' ),
+                'remove' => __( 'Rimuovi', 'schema-graph-for-acf' ),
             ],
         ] );
     }
@@ -198,14 +195,7 @@ class Schema_Graph_Admin {
     }
 
     private function sanitize_deep( $value ) {
-        if ( is_array( $value ) ) {
-            $out = [];
-            foreach ( $value as $k => $v ) {
-                $out[ sanitize_text_field( $k ) ] = $this->sanitize_deep( $v );
-            }
-            return $out;
-        }
-        return sanitize_text_field( (string) $value );
+        return map_deep( $value, 'sanitize_text_field' );
     }
 
     public function ajax_preview() {
