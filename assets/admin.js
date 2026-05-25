@@ -12,6 +12,7 @@
         { value: 'static',   label: 'Valore fisso (static)' },
         { value: 'fallback', label: 'Fallback (lista ordinata)' },
         { value: 'collect',  label: 'Collect (lista campi ACF)' },
+        { value: 'repeater', label: 'Repeater (sub-field)' },
         { value: 'relation', label: 'Relation (ACF relationship)' }
     ];
 
@@ -112,6 +113,8 @@
             var type = $(this).data('acf-type');
             if (type === 'relationship' || type === 'post_object') {
                 applyToActiveRow('relation', { relation: name });
+            } else if (type === 'repeater') {
+                applyToActiveRow('repeater', { repeater: name });
             } else {
                 applyToActiveRow('acf', name);
             }
@@ -165,6 +168,7 @@
             if ('static' in source)   return 'static';
             if ('fallback' in source) return 'fallback';
             if ('collect' in source)  return 'collect';
+            if ('repeater' in source) return 'repeater';
             if ('relation' in source) return 'relation';
             if ('acf' in source)      return 'acf';
         }
@@ -178,6 +182,7 @@
             case 'static':   return renderStaticInput(source);
             case 'fallback': return renderListInput(source && source.fallback, 'token-or-field', 'un valore per riga (es. :excerpt)');
             case 'collect':  return renderListInput(source && source.collect, 'field', 'un nome campo ACF per riga');
+            case 'repeater': return renderRepeaterInput(source);
             case 'relation': return renderRelationInput(source);
         }
         return '';
@@ -217,6 +222,15 @@
     function renderListInput(items, _hint, placeholder) {
         var lines = Array.isArray(items) ? items.join('\n') : '';
         return '<textarea class="sg-val-list" rows="3" placeholder="' + escapeHtml(placeholder) + '">' + escapeHtml(lines) + '</textarea>';
+    }
+
+    function renderRepeaterInput(source) {
+        source = source || {};
+        return '' +
+            '<div class="sg-value-multi-row">' +
+                '<input type="text" class="sg-val-rep" value="' + escapeHtml(source.repeater || '') + '" placeholder="nome campo repeater">' +
+                '<input type="text" class="sg-val-rep-sub" value="' + escapeHtml(source.subfield || '') + '" placeholder="nome sub-field (es. url)">' +
+            '</div>';
     }
 
     function renderRelationInput(source) {
@@ -278,6 +292,13 @@
                 var lines2 = splitLines($row.find('.sg-val-list').val());
                 if (!lines2.length) return null;
                 return { collect: lines2 };
+            }
+
+            case 'repeater': {
+                var rep = $row.find('.sg-val-rep').val().trim();
+                var sub = $row.find('.sg-val-rep-sub').val().trim();
+                if (!rep || !sub) return null;
+                return { repeater: rep, subfield: sub };
             }
 
             case 'relation': {
@@ -370,6 +391,10 @@
             $row.find('.sg-val-acf-name').val(value);
         } else if (kind === 'relation' && value && typeof value === 'object') {
             $row.find('.sg-val-rel').val(value.relation || '');
+        } else if (kind === 'repeater' && value && typeof value === 'object') {
+            $row.find('.sg-val-rep').val(value.repeater || '');
+            $row.find('.sg-val-rep-sub').trigger('focus');
+            return;
         }
         $row.find('.sg-prop').trigger('focus');
     }

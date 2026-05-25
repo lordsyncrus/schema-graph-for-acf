@@ -184,6 +184,12 @@ class Schema_Graph_Admin {
         if ( isset( $source['collect'] ) && is_array( $source['collect'] ) ) {
             return [ 'collect' => array_values( array_map( 'sanitize_text_field', $source['collect'] ) ) ];
         }
+        if ( isset( $source['repeater'] ) ) {
+            return [
+                'repeater' => sanitize_text_field( $source['repeater'] ),
+                'subfield' => sanitize_text_field( $source['subfield'] ?? '' ),
+            ];
+        }
         if ( isset( $source['relation'] ) ) {
             $out = [
                 'relation' => sanitize_text_field( $source['relation'] ),

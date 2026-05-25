@@ -105,6 +105,20 @@ class Schema_Graph_Render {
                 return $vals ?: null;
             }
 
+            if ( isset( $source['repeater'] ) ) {
+                $sub = $source['subfield'] ?? '';
+                if ( $sub === '' ) return null;
+                $rows = $this->acf( $source['repeater'], $post->ID );
+                if ( ! is_array( $rows ) ) return null;
+                $vals = [];
+                foreach ( $rows as $row ) {
+                    if ( ! is_array( $row ) || ! array_key_exists( $sub, $row ) ) continue;
+                    $v = $this->normalize_acf_value( $row[ $sub ] );
+                    if ( $this->not_empty( $v ) ) $vals[] = $v;
+                }
+                return $vals ?: null;
+            }
+
             if ( isset( $source['relation'] ) ) {
                 $related = $this->acf( $source['relation'], $post->ID );
                 if ( ! $related ) return null;

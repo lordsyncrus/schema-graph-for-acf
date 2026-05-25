@@ -61,6 +61,7 @@ For each schema.org property you pick a source kind from a dropdown:
 | **Static** | Fixed value (string or JSON object). Tokens (`:site_name`) are resolved if used as whole values; `{{:token}}` interpolation works inside strings |
 | **Fallback** | Ordered list: first non-empty value wins |
 | **Collect** | Combines multiple ACF fields into an array, dropping empties (ideal for `sameAs`) |
+| **Repeater** | ACF Repeater → array of values from a single sub-field. Two inputs: repeater name + sub-field name. Ideal for user-managed `sameAs` link lists (ACF Pro only) |
 | **Relation** | ACF relationship/post_object field → array of typed sub-nodes `{@type, @id, name, url}`. Set `single` for 1:1 relations |
 
 `null`, `''` and `[]` are **automatically stripped** from the final JSON-LD.
@@ -110,45 +111,6 @@ Output on the artist page:
 }
 ```
 
-## Architecture
-
-```
-┌────────────────────────────────────────┐
-│  Admin UI                              │
-│  Schema Graph menu → Edit CPT screen   │
-└───────────────────┬────────────────────┘
-                    ▼ (save / ajax preview)
-       wp_options['schema_graph_config']
-                    ▼ (read, memoized per request)
-       Schema_Graph_Render::output()
-                    ▼
-       <script type="application/ld+json">…</script>
-```
-
-### File layout
-
-```
-schema-graph.php                              # bootstrap (header + autoload)
-includes/
-  class-schema-graph-config-store.php         # option CRUD
-  class-schema-graph-render.php               # JSON-LD output, build_node, resolve
-  class-schema-graph-catalog.php              # loads schema-catalog*.json
-  class-schema-graph-acf-introspect.php       # lists ACF fields per CPT
-  class-schema-graph-admin.php                # menu, screens, save, ajax, import/export
-  views/
-    list.php                                  # CPT list + import/export UI
-    edit.php                                  # mapping form
-data/
-  schema-catalog.json                         # ~922 types from official schema.org vocab
-  schema-catalog-curated.json                 # ~25 hand-picked types for common SEO use
-assets/
-  admin.css
-  admin.js
-bin/
-  build-catalog.php                           # regenerates schema-catalog.json from schema.org CSVs
-  build-zip.sh                                # packages dist/<slug>-<version>.zip
-```
-
 ## Validation
 
 - [Schema Markup Validator](https://validator.schema.org/) — paste the page URL
@@ -185,10 +147,6 @@ The property input is **free text**, so any property name not in the catalog can
 ```
 
 Reads the version from the plugin header, runs PHP lint, packages a clean `dist/schema-graph-for-acf-<version>.zip` ready for upload via the WP admin.
-
-## Migrating from v2.x
-
-v3.0.0 **removed the `schema_graph/config` filter** in favor of a UI-managed option. If you had a PHP config, re-create the CPT mappings from the Schema Graph menu (a one-time, few-minutes operation per site). Or export your old config to a JSON file (matching the shape of the new export) and use the import UI.
 
 ## License
 
